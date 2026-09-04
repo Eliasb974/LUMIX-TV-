@@ -95,77 +95,75 @@
 
     <script>
         const CONFIGURACION = {
-    configuracion: {
-        token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxNzg4Njk5NzIxIiwic2lwIjoiMTg2LjEyLjE4NC4yMzkiLCJwYXRoIjoiL2xpdmUvYzdlZHMvVW5pdmVyc28vU0FfTGl2ZV9obHNfZmFpcnBsYXkvIiwic2Vzc2lvbl9jZG5faWQiOiI2NmZjMGYxMWQ0N2ViYzVjIiwic2Vzc2lvbl9pZCI6IiIsImNsaWVudF9pZCI6IiIsImRldmljZV9pZCI6IiIsIm1heF9zZXNzaW9ucyI6MCwic2Vzc2lvbl9kdXJhdGlvbiI6MCwidXJsIjoiaHR0cHM6Ly8yMDEuMjM1LjY2LjEyMiIsImF1ZCI6IjcxIiwic291cmNlcyI6Wzg1LDIxMCw4Niw4OF19.tJzRQ2cnEHJrDym6uNl5Gbgy510L7wr7PrNJKCBt_wHlTCw7SWFj8MAy5cu462OHMP5bHxygrJwwQyh08Ud4PA==",
-        baseUrl: "https://edge-live14-hr.cvattv.com.ar/tok_",
-        proxy: {
-            habilitado: true,
-            tipo: "rotativo",
-            endpoint: "http://qsopindx:fkdchfwhhz6n@p.webshare.io:80",
-            usuario: "qsopindx",
-            contraseña: "fkdchfwhhz6n",
-            rotacionAutomatica: true,
-            cambiarCadaSolicitud: true,
-            intentosMaximos: 3,
-            tiempoReintento: 2000
-        },
-        headers: {
-            "Origin": "https://portal.app.flow.com.ar",
-            "Referer": "https://portal.app.flow.com.ar/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
-        }
-    },
-    canales: {
-        "SNT": {
-            "num": 1,
-            "nombre": "SNT",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/snt_7bc364b8e1b049f495af62b271aa81fe.png",
-            "tipo": "hls",
-            "url": "https://corsproxy.io/?" + encodeURIComponent("https://live.enhdtv.com:8081/8060/index.m3u8")
-        },
-        "TELEFUTURO": {
-            "num": 2,
-            "nombre": "TELEFUTURO",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/telefuturo_2795f0598a5b41db83809e4ff3c7039e.png",
-            "tipo": "dash",
-            "ruta": "/live/c4eds/TELEFUTURO_C4/SA_Live_dash_enc/TELEFUTURO_C4.mpd",
-            "drmKeyUrl": "https://results.femon.net/?keyid=ed2e9a12e8ae518192c371b6ee86744b&key=05059d1cb21b6708a55e9c26fb38e2f3&key=7eaa24ac6e23fd7be2d48005d916eeb4"
-        },
-        "GEN": {
-            "num": 3,
-            "nombre": "GEN",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/gen_024aa528d36c4e31aa00c436f3a82f15.png",
-            "tipo": "dash",
-            "ruta": "/live/c7eds/GEN_TV/SA_Live_dash_enc/GEN_TV.mpd",
-            "drmKeyUrl": "https://results.femon.net/?keyid=49eb924ba998ca7fbbaee30dcef1ecb4&key=6e131b04b2e87598fb588ac205673698"
-        },
-        "NPY": {
-            "num": 4,
-            "nombre": "NPY",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/noticias-py_17ff9a389b4a40c8ad3f3be73acfc21e.png",
-            "tipo": "hls",
-            "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/npy/npy_py_baja/playlist.m3u8?admin=tvaccion")
-        },
-        "LA_TELE": {
-            "num": 5,
-            "nombre": "LA TELE",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/la-tele_4a03574b08344bf8b3a5fb8740188252.png",
-            "tipo": "hls",
-            "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/latele/latele_py_baja/playlist.m3u8?admin=tvaccion")
-        },
-        "E40": {
-            "num": 6,
-            "nombre": "E40",
-            "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/estacion-40_2e6856af4ddd42d8bde713998d7aae8b.png",
-            "tipo": "hls",
-            "url": "https://corsproxy.io/?" + encodeURIComponent("https://rds3gen.desdeparaguay.net/e40tv/e40tv_py_alta/playlist.m3u8?admin=tvaccion")
-        }
-    }
-};
+            configuracion: {
+                token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxNzg4Njk5NzIxIiwic2lwIjoiMTg2LjEyLjE4NC4yMzkiLCJwYXRoIjoiL2xpdmUvYzdlZHMvVW5pdmVyc28vU0FfTGl2ZV9obHNfZmFpcnBsYXkvIiwic2Vzc2lvbl9jZG5faWQiOiI2NmZjMGYxMWQ0N2ViYzVjIiwic2Vzc2lvbl9pZCI6IiIsImNsaWVudF9pZCI6IiIsImRldmljZV9pZCI6IiIsIm1heF9zZXNzaW9ucyI6MCwic2Vzc2lvbl9kdXJhdGlvbiI6MCwidXJsIjoiaHR0cHM6Ly8yMDEuMjM1LjY2LjEyMiIsImF1ZCI6IjcxIiwic291cmNlcyI6Wzg1LDIxMCw4Niw4OF19.tJzRQ2cnEHJrDym6uNl5Gbgy510L7wr7PrNJKCBt_wHlTCw7SWFj8MAy5cu462OHMP5bHxygrJwwQyh08Ud4PA==",
+                proxy: {
+                    habilitado: true,
+                    tipo: "rotativo",
+                    endpoint: "http://qsopindx:fkdchfwhhz6n@p.webshare.io:80",
+                    usuario: "qsopindx",
+                    contraseña: "fkdchfwhhz6n",
+                    rotacionAutomatica: true,
+                    cambiarCadaSolicitud: true,
+                    intentosMaximos: 3,
+                    tiempoReintento: 2000
+                },
+                headers: {
+                    "Origin": "https://portal.app.flow.com.ar",
+                    "Referer": "https://portal.app.flow.com.ar/",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+                }
+            },
+            canales: {
+                "SNT": {
+                    "num": 1,
+                    "nombre": "SNT",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/snt_7bc364b8e1b049f495af62b271aa81fe.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://live.enhdtv.com:8081/8060/index.m3u8")
+                },
+                "TELEFUTURO": {
+                    "num": 2,
+                    "nombre": "TELEFUTURO",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/telefuturo_2795f0598a5b41db83809e4ff3c7039e.png",
+                    "tipo": "dash",
+                    "ruta": "https://corsproxy.io/?" + encodeURIComponent("https://edge-live14-hr.cvattv.com.ar/tok_eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxNzg4Njk5NzIxIiwic2lwIjoiMTg2LjEyLjE4NC4yMzkiLCJwYXRoIjoiL2xpdmUvYzdlZHMvVW5pdmVyc28vU0FfTGl2ZV9obHNfZmFpcnBsYXkvIiwic2Vzc2lvbl9jZG5faWQiOiI2NmZjMGYxMWQ0N2ViYzVjIiwic2Vzc2lvbl9pZCI6IiIsImNsaWVudF9pZCI6IiIsImRldmljZV9pZCI6IiIsIm1heF9zZXNzaW9ucyI6MCwic2Vzc2lvbl9kdXJhdGlvbiI6MCwidXJsIjoiaHR0cHM6Ly8yMDEuMjM1LjY2LjEyMiIsImF1ZCI6IjcxIiwic291cmNlcyI6Wzg1LDIxMCw4Niw4OF19.tJzRQ2cnEHJrDym6uNl5Gbgy510L7wr7PrNJKCBt_wHlTCw7SWFj8MAy5cu462OHMP5bHxygrJwwQyh08Ud4PA==/live/c4eds/TELEFUTURO_C4/SA_Live_dash_enc/TELEFUTURO_C4.mpd"),
+                    "drmKeyUrl": "https://results.femon.net/?keyid=ed2e9a12e8ae518192c371b6ee86744b&key=05059d1cb21b6708a55e9c26fb38e2f3&key=7eaa24ac6e23fd7be2d48005d916eeb4"
+                },
+                "GEN": {
+                    "num": 3,
+                    "nombre": "GEN",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/gen_024aa528d36c4e31aa00c436f3a82f15.png",
+                    "tipo": "dash",
+                    "ruta": "https://corsproxy.io/?" + encodeURIComponent("https://edge-live14-hr.cvattv.com.ar/tok_eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxNzg4Njk5NzIxIiwic2lwIjoiMTg2LjEyLjE4NC4yMzkiLCJwYXRoIjoiL2xpdmUvYzdlZHMvVW5pdmVyc28vU0FfTGl2ZV9obHNfZmFpcnBsYXkvIiwic2Vzc2lvbl9jZG5faWQiOiI2NmZjMGYxMWQ0N2ViYzVjIiwic2Vzc2lvbl9pZCI6IiIsImNsaWVudF9pZCI6IiIsImRldmljZV9pZCI6IiIsIm1heF9zZXNzaW9ucyI6MCwic2Vzc2lvbl9kdXJhdGlvbiI6MCwidXJsIjoiaHR0cHM6Ly8yMDEuMjM1LjY2LjEyMiIsImF1ZCI6IjcxIiwic291cmNlcyI6Wzg1LDIxMCw4Niw4OF19.tJzRQ2cnEHJrDym6uNl5Gbgy510L7wr7PrNJKCBt_wHlTCw7SWFj8MAy5cu462OHMP5bHxygrJwwQyh08Ud4PA==/live/c7eds/GEN_TV/SA_Live_dash_enc/GEN_TV.mpd"),
+                    "drmKeyUrl": "https://results.femon.net/?keyid=49eb924ba998ca7fbbaee30dcef1ecb4&key=6e131b04b2e87598fb588ac205673698"
+                },
+                "NPY": {
+                    "num": 4,
+                    "nombre": "NPY",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/noticias-py_17ff9a389b4a40c8ad3f3be73acfc21e.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/npy/npy_py_baja/playlist.m3u8?admin=tvaccion")
+                },
+                "LA_TELE": {
+                    "num": 5,
+                    "nombre": "LA TELE",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/la-tele_4a03574b08344bf8b3a5fb8740188252.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/latele/latele_py_baja/playlist.m3u8?admin=tvaccion")
+                },
+                "E40": {
+                    "num": 6,
+                    "nombre": "E40",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/estacion-40_2e6856af4ddd42d8bde713998d7aae8b.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://rds3gen.desdeparaguay.net/e40tv/e40tv_py_alta/playlist.m3u8?admin=tvaccion")
+                }
+            }
+        };
 
         let CONFIG_GLOBAL = {
             token: CONFIGURACION.configuracion.token,
-            baseUrl: CONFIGURACION.configuracion.baseUrl,
             proxy: CONFIGURACION.configuracion.proxy,
             headers: CONFIGURACION.configuracion.headers
         };
@@ -209,8 +207,8 @@
         }
 
         async function reproducirCanalDASH(canal) {
-            const URL_COMPLETA = CONFIG_GLOBAL.baseUrl + CONFIG_GLOBAL.token + canal.ruta;
-            console.log("📡 DASH:", canal.name, "→", URL_COMPLETA);
+            const URL_COMPLETA = canal.ruta;
+            console.log("📡 DASH:", canal.name, "→", URL_COMPLETA.substring(0, 80) + "...");
             reproduciendoOk = false;
             canalActual = canal;
             mostrarSinSenal();
@@ -220,21 +218,28 @@
             
             shaka.polyfill.installAll();
             shakaPlayer = new shaka.Player(video);
-            shakaPlayer.addEventListener('error', (e) => { console.error("Error Shaka:", e.detail); mostrarSinSenal(); });
+            shakaPlayer.addEventListener('error', (e) => { 
+                console.error("❌ Error Shaka:", e.detail.code, e.detail.severity); 
+                mostrarSinSenal(); 
+            });
 
             try {
                 shakaPlayer.configure({
                     streaming: { bufferingGoal: 15, rebufferingGoal: 2 },
-                    network: { requestHeaders: CONFIG_GLOBAL.headers }
+                    network: { 
+                        requestHeaders: CONFIG_GLOBAL.headers,
+                        useCors: true
+                    }
                 });
 
                 if (canal.drmKeyUrl) {
                     const claves = await obtenerClavesDRM(canal.drmKeyUrl);
+                    console.log("🔑 Respuesta DRM:", claves);
                     if (claves && claves.keys?.length > 0) {
                         const kidHex = base64AHex(claves.keys[0].kid);
                         const keyHex = base64AHex(claves.keys[0].k);
+                        console.log("✅ DRM — KID:", kidHex, "KEY:", keyHex);
                         shakaPlayer.configure({ drm: { clearKeys: { [kidHex]: keyHex } } });
-                        console.log("✅ DRM:", canal.name);
                     }
                 }
 
@@ -245,14 +250,14 @@
                 reproduciendoOk = true;
                 console.log("✅ Reproduciendo:", canal.name);
             } catch (err) {
-                console.error("❌ Error DASH:", err);
+                console.error("❌ Error DASH:", err.code, err.message);
                 mostrarSinSenal();
             }
         }
 
         function reproducirCanalHLS(canal) {
             const url = canal.url;
-            console.log("📡 HLS:", canal.name, "→", url);
+            console.log("📡 HLS:", canal.name, "→", url.substring(0, 80) + "...");
             reproduciendoOk = false;
             canalActual = canal;
             mostrarSinSenal();
@@ -268,7 +273,10 @@
                     ocultarSinSenal();
                     reproduciendoOk = true;
                 });
-                hls.on(Hls.Events.ERROR, (evt, data) => { if (data.fatal) mostrarSinSenal(); });
+                hls.on(Hls.Events.ERROR, (evt, data) => { 
+                    console.error("❌ Error HLS:", data.details, data.fatal);
+                    if (data.fatal) mostrarSinSenal(); 
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = url;
                 video.addEventListener('loadedmetadata', () => {
@@ -277,7 +285,10 @@
                     ocultarSinSenal();
                     reproduciendoOk = true;
                 });
-                video.addEventListener('error', mostrarSinSenal);
+                video.addEventListener('error', (e) => {
+                    console.error("❌ Error video nativo:", e);
+                    mostrarSinSenal();
+                });
             }
         }
 
