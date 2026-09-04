@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMIX TV</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/shaka-player@4.12.9/dist/shaka-player.compiled.min.js"></script>
+
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',sans-serif;user-select:none}
+        :root{--fondo-negro:#0a0510;--texto-claro:#CCCCCC;--texto-activo:#FFFFFF;--carga-azul:#a78bfa;--borde-lista:#241a33;--acento:#7c3aed;--panel-fondo:#141019;--panel-fondo-2:#1e1728}
+        html,body{background:var(--fondo-negro);color:var(--texto-claro);width:100vw;height:100vh;overflow:hidden}
+        .pantalla{display:flex;width:100%;height:100%;position:relative}
+        .barra-estado{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:18px;font-size:16px;z-index:20}
+        .hora{font-size:15px}
+        body.fullscreen-activo .barra-estado{display:none}
+        .menu-lateral{width:140px;padding:80px 0 20px 30px;display:flex;flex-direction:column;gap:18px;z-index:10}
+        .opcion-menu{font-size:17px;color:var(--texto-claro);cursor:pointer;padding:8px 6px;border-radius:4px;transition:all .2s}
+        .opcion-menu.activo{color:var(--texto-activo);font-weight:500}
+        body.fullscreen-activo .menu-lateral{display:none}
+        .area-central{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer}
+        body.fullscreen-activo .area-central{width:100vw;height:100vh;flex:none}
+        video{width:100%;height:100%;object-fit:contain;display:none;background:#000;pointer-events:none}
+        body.fullscreen-activo video{object-fit:cover}
+        .sin-senal{position:absolute;top:0;left:0;width:100%;height:100%;background:#0f0 url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjrWXlALDZ1GH4lK5QPiglCp6h1ockN-eMVMDXn63PcXvEjzcijPbx-MT5zsqjh280HIIyrnCzIIKCjuj6zYpwmY4FZiBI1vkCU0oSBWyrWIt4qD7_Ck0yEFMEIRQEs4z2pBSHTjg_DtD3o-TQUN2-3xQv-VAs8_r6yHoEtQLFTH-GQ46QAFFSjUcYV12wm/s320/Efecto-de-tv-sin-se%C3%B1al.-Pantalla-verde..gif') center/cover no-repeat;display:flex;align-items:center;justify-content:center;z-index:5;opacity:1;transition:opacity .25s ease;pointer-events:none}
+        .sin-senal.oculto{opacity:0}
+        .sin-senal span{background:rgba(0,0,0,.55);color:#fff;font-size:14px;padding:6px 14px;border-radius:4px;letter-spacing:1px}
+        .btn-pantalla{position:absolute;bottom:15px;right:15px;font-size:18px;cursor:pointer;transition:.2s;z-index:15;padding:6px}
+        .btn-pantalla:hover,.btn-pantalla:focus{color:var(--texto-activo)}
+        .lista-canales{width:220px;border-left:1px solid var(--borde-lista);padding:70px 15px 20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;z-index:10;background:var(--panel-fondo)}
+        .flecha-arriba{text-align:center;margin-bottom:5px}
+        .panel-encabezado,.panel-busqueda{display:none}
+        body.fullscreen-activo .lista-canales{position:fixed;top:0;left:0;height:100%;width:340px;max-width:88vw;background:linear-gradient(180deg,var(--panel-fondo)0%,var(--panel-fondo-2)100%);border-left:none;border-right:1px solid var(--borde-lista);transform:translateX(-100%);transition:transform .3s ease;z-index:50;padding:0;gap:0}
+        body.fullscreen-activo .lista-canales.visible{transform:translateX(0)}
+        body.fullscreen-activo .flecha-arriba{display:none}
+        body.fullscreen-activo .panel-encabezado{display:flex;align-items:center;justify-content:space-between;padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+        .panel-titulo{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;color:var(--texto-activo)}
+        .panel-acciones{display:flex;align-items:center;gap:10px}
+        .btn-panel{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);color:var(--texto-activo);cursor:pointer;font-size:16px}
+        .btn-panel.salir{background:rgba(124,58,237,.18);color:var(--acento)}
+        .btn-panel:hover,.btn-panel:focus{background:rgba(255,255,255,.18)}
+        .btn-panel.salir:hover,.btn-panel.salir:focus{background:rgba(124,58,237,.32)}
+        body.fullscreen-activo .panel-busqueda{display:flex;gap:8px;padding:14px 18px}
+        .input-busqueda{flex:1;width:100%;border:none;outline:none;border-radius:24px;padding:11px 16px;font-size:14px;background:rgba(255,255,255,.06);color:var(--texto-activo)}
+        .input-busqueda::placeholder{color:#7A6296}
+        body.fullscreen-activo .lista-canales-scroll{overflow-y:auto;padding:4px 12px 20px;display:flex;flex-direction:column;gap:8px;height:calc(100% - 128px)}
+        .tarjeta-canal{display:flex;align-items:center;gap:12px;padding:10px;border-radius:6px;cursor:pointer;transition:.2s;border:1px solid transparent}
+        body.fullscreen-activo .tarjeta-canal{border-radius:10px;padding:10px 10px}
+        .tarjeta-canal:hover,.tarjeta-canal.seleccionado,.tarjeta-canal:focus{background:rgba(255,255,255,.08);border-color:var(--carga-azul)}
+        .numero-canal{width:22px;flex-shrink:0;text-align:right;font-size:13px;color:#888;font-variant-numeric:tabular-nums}
+        .logo-canal{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:13px;color:white;flex-shrink:0;overflow:hidden;background:#241a33}
+        .logo-canal img{width:100%;height:100%;object-fit:cover}
+        .info-canal{display:flex;flex-direction:column;flex:1;min-width:0}
+        .nombre-canal{font-size:15px;color:var(--texto-activo);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .subtitulo-canal{font-size:12px;color:#7A6296}
+        .chevron-canal{display:none;color:#7A6296;font-size:16px;flex-shrink:0}
+        body.fullscreen-activo .chevron-canal{display:block}
+        .watermark{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);color:#fff;font-size:18px;font-weight:500;text-shadow:2px 2px 4px rgba(0,0,0,.9);opacity:.45;pointer-events:none;z-index:10;white-space:nowrap;font-family:Arial,sans-serif}
+        .opcion-menu:focus,.btn-pantalla:focus{outline:3px solid var(--carga-azul);outline-offset:2px;background:rgba(255,255,255,.06)}
+        .tarjeta-canal:focus{outline:3px solid var(--carga-azul);outline-offset:-3px}
+        :focus{outline-color:var(--carga-azul)}
+        :focus:not(:focus-visible){outline:none}
+        :focus-visible{outline:3px solid var(--carga-azul)}
+        @media screen and (min-width:1280px){.menu-lateral{width:180px;padding-left:40px;gap:26px}.opcion-menu{font-size:22px}.lista-canales{width:280px;padding-top:90px;gap:16px}body.fullscreen-activo .lista-canales{width:380px}.nombre-canal{font-size:19px}.numero-canal{font-size:16px;width:30px}.logo-canal{width:52px;height:52px;font-size:15px}.barra-estado{font-size:20px;gap:24px}.hora{font-size:18px}.btn-pantalla{font-size:26px;bottom:24px;right:24px}.tarjeta-canal{padding:14px}}
+        @media (hover:none){.tarjeta-canal:hover{background:transparent;border-color:transparent}}
+    </style>
+</head>
+<body>
+    <div class="pantalla">
+        <div class="barra-estado"><span>🕒</span><span>🔔</span><span>📶</span><span class="hora">00:00</span></div>
+        <nav class="menu-lateral">
+            <div class="opcion-menu activo" tabindex="0">TV</div>
+            <div class="opcion-menu" tabindex="0" data-href="v2">PELÍCULA</div>
+            <div class="opcion-menu" tabindex="0" data-href="v3">SERIES</div>
+            <div class="opcion-menu" tabindex="0" data-href="v4">KIDS</div>
+            <div class="opcion-menu" tabindex="0" data-href="v5">ANIME</div>
+        </nav>
+        <main class="area-central" id="area-central">
+            <video id="reproductor" playsinline webkit-playsinline x5-playsinline muted></video>
+            <div class="sin-senal" id="sin-senal"><span>Cargando...</span></div>
+            <div class="btn-pantalla" id="btn-full" tabindex="0">⛶</div>
+            <div class="watermark">LUMIX TV</div>
+        </main>
+        <aside class="lista-canales" id="lista-canales">
+            <div class="panel-encabezado">
+                <div class="panel-titulo"><span>📺</span><span>Canales</span></div>
+                <div class="panel-acciones"><div class="btn-panel salir" id="btn-salir-panel" tabindex="0">⇥</div></div>
+            </div>
+            <div class="panel-busqueda"><input class="input-busqueda" id="input-busqueda" type="text" placeholder="Buscar canal..."></div>
+            <div class="flecha-arriba">▲</div>
+            <div class="lista-canales-scroll" id="lista-canales-scroll"></div>
+        </aside>
+    </div>
+
+    <script>
+        const CONFIGURACION = {
+            configuracion: {
+                token: "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxNzg4MzUyMTE5Iiwic2lwIjoiMTg2LjEyLjE4NC4yMzkiLCJwYXRoIjoiL2xpdmUvYzdlZHMvVW5pdmVyc28vU0FfTGl2ZV9obHNfZmFpcnBsYXkvIiwic2Vzc2lvbl9jZG5faWQiOiI3MjYxZDZjNzAyMzc5NDNlIiwic2Vzc2lvbl9pZCI6IiIsImNsaWVudF9pZCI6IiIsImRldmljZV9pZCI6IiIsIm1heF9zZXNzaW9ucyI6MCwic2Vzc2lvbl9kdXJhdGlvbiI6MCwidXJsIjoiaHR0cHM6Ly8yMDEuMjM1LjY2LjExNCIsImF1ZCI6IjMxNSIsInNvdXJjZXMiOls4NSwxNDQsMjEwLDg2LDg4XX0=.fzjriu0qOgShdVx6eFmp0kD8ufSFMF5HZvIASW2BKommokt4gBO-wH6bFyZDteC_7npfUnapv6XvpdMrt4fp_g==",
+                baseUrl: "https://edge-live10-hr.cvattv.com.ar/tok_",
+                proxy: {
+                    habilitado: true,
+                    tipo: "rotativo",
+                    endpoint: "http://qsopindx:fkdchfwhhz6n@p.webshare.io:80",
+                    usuario: "qsopindx",
+                    contraseña: "fkdchfwhhz6n",
+                    rotacionAutomatica: true,
+                    cambiarCadaSolicitud: true,
+                    intentosMaximos: 3,
+                    tiempoReintento: 2000
+                },
+                headers: {
+                    "Origin": "https://portal.app.flow.com.ar",
+                    "Referer": "https://portal.app.flow.com.ar/",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36"
+                }
+            },
+            canales: {
+                "SNT": {
+                    "num": 1,
+                    "nombre": "SNT",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/snt_7bc364b8e1b049f495af62b271aa81fe.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://live.enhdtv.com:8081/8060/index.m3u8")
+                },
+                "TELEFUTURO": {
+                    "num": 2,
+                    "nombre": "TELEFUTURO",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/telefuturo_2795f0598a5b41db83809e4ff3c7039e.png",
+                    "tipo": "dash",
+                    "ruta": "/live/c4eds/TELEFUTURO_C4/sa_dash_full_e_7CF9BB041AD89713AD8CF4CF/TELEFUTURO_C4.mpd",
+                    "drmKeyUrl": "https://results.femon.net/?keyid=5d2731cf8a59b73438ef59d88cd882bf&key=3f412fa6368b7db4903588de695377e1"
+                },
+                "GEN": {
+                    "num": 3,
+                    "nombre": "GEN",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/gen_024aa528d36c4e31aa00c436f3a82f15.png",
+                    "tipo": "dash",
+                    "ruta": "/live/c7eds/GEN_TV/SA_Live_dash_enc/GEN_TV.mpd",
+                    "drmKeyUrl": "https://results.femon.net/?keyid=49eb924ba998ca7fbbaee30dcef1ecb4&key=6e131b04b2e87598fb588ac205673698"
+                },
+                "NPY": {
+                    "num": 4,
+                    "nombre": "NPY",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/noticias-py_17ff9a389b4a40c8ad3f3be73acfc21e.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/npy/npy_py_baja/playlist.m3u8?admin=tvaccion")
+                },
+                "LA_TELE": {
+                    "num": 5,
+                    "nombre": "LA TELE",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/la-tele_4a03574b08344bf8b3a5fb8740188252.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://copacotf.desdeparaguay.net/latele/latele_py_baja/playlist.m3u8?admin=tvaccion")
+                },
+                "E40": {
+                    "num": 6,
+                    "nombre": "E40",
+                    "logo": "https://solparaguay.qvixprimary.com/assets/resources/img/channels/estacion-40_2e6856af4ddd42d8bde713998d7aae8b.png",
+                    "tipo": "hls",
+                    "url": "https://corsproxy.io/?" + encodeURIComponent("https://rds3gen.desdeparaguay.net/e40tv/e40tv_py_alta/playlist.m3u8?admin=tvaccion")
+                }
+            }
+        };
+
+        let CONFIG_GLOBAL = {
+            token: CONFIGURACION.configuracion.token,
+            baseUrl: CONFIGURACION.configuracion.baseUrl,
+            proxy: CONFIGURACION.configuracion.proxy,
+            headers: CONFIGURACION.configuracion.headers
+        };
+        
+        let CHANNELS = Object.keys(CONFIGURACION.canales).map(clave => {
+            const c = CONFIGURACION.canales[clave];
+            return {
+                id: clave,
+                num: c.num,
+                name: c.nombre,
+                logo: c.logo,
+                tipo: c.tipo,
+                url: c.url || null,
+                ruta: c.ruta || null,
+                drmKeyUrl: c.drmKeyUrl || null
+            };
+        });
+
+        const video = document.getElementById('reproductor');
+        const sinSenal = document.getElementById('sin-senal');
+        const listaScrollEl = document.getElementById('lista-canales-scroll');
+        const listaCanalesEl = document.getElementById('lista-canales');
+        const areaCentral = document.getElementById('area-central');
+        const inputBusqueda = document.getElementById('input-busqueda');
+        let shakaPlayer = null;
+        let reproduciendoOk = false;
+        let canalActual = null;
+
+        async function obtenerClavesDRM(drmUrl) {
+            if (!drmUrl) return null;
+            try {
+                const resp = await fetch(drmUrl);
+                return await resp.json();
+            } catch (err) {
+                console.error("Error DRM:", err);
+                return null;
+            }
+        }
+        function base64AHex(str) {
+            return atob(str).split('').map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+        }
+
+        async function reproducirCanalDASH(canal) {
+            const URL_COMPLETA = CONFIG_GLOBAL.baseUrl + CONFIG_GLOBAL.token + canal.ruta;
+            console.log("📡 DASH:", canal.name, "→", URL_COMPLETA);
+            reproduciendoOk = false;
+            canalActual = canal;
+            mostrarSinSenal();
+
+            if (shakaPlayer) { shakaPlayer.unload(); shakaPlayer.destroy(); shakaPlayer = null; }
+            if (!shaka.Player.isBrowserSupported()) { alert("❌ Navegador no compatible con DASH"); return; }
+            
+            shaka.polyfill.installAll();
+            shakaPlayer = new shaka.Player(video);
+            shakaPlayer.addEventListener('error', (e) => { console.error("Error Shaka:", e.detail); mostrarSinSenal(); });
+
+            try {
+                shakaPlayer.configure({
+                    streaming: { bufferingGoal: 15, rebufferingGoal: 2 },
+                    network: { requestHeaders: CONFIG_GLOBAL.headers }
+                });
+
+                if (canal.drmKeyUrl) {
+                    const claves = await obtenerClavesDRM(canal.drmKeyUrl);
+                    if (claves && claves.keys?.length > 0) {
+                        const kidHex = base64AHex(claves.keys[0].kid);
+                        const keyHex = base64AHex(claves.keys[0].k);
+                        shakaPlayer.configure({ drm: { clearKeys: { [kidHex]: keyHex } } });
+                        console.log("✅ DRM:", canal.name);
+                    }
+                }
+
+                await shakaPlayer.load(URL_COMPLETA);
+                video.style.display = 'block';
+                ocultarSinSenal();
+                await video.play().catch(() => video.muted = true);
+                reproduciendoOk = true;
+                console.log("✅ Reproduciendo:", canal.name);
+            } catch (err) {
+                console.error("❌ Error DASH:", err);
+                mostrarSinSenal();
+            }
+        }
+
+        function reproducirCanalHLS(canal) {
+            const url = canal.url;
+            console.log("📡 HLS:", canal.name, "→", url);
+            reproduciendoOk = false;
+            canalActual = canal;
+            mostrarSinSenal();
+            limpiarReproductor();
+
+            if (window.Hls && Hls.isSupported()) {
+                const hls = new Hls({ maxBufferLength: 15, enableWorker: false });
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    video.style.display = 'block';
+                    video.play().catch(() => video.muted = true);
+                    ocultarSinSenal();
+                    reproduciendoOk = true;
+                });
+                hls.on(Hls.Events.ERROR, (evt, data) => { if (data.fatal) mostrarSinSenal(); });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.addEventListener('loadedmetadata', () => {
+                    video.style.display = 'block';
+                    video.play().catch(() => video.muted = true);
+                    ocultarSinSenal();
+                    reproduciendoOk = true;
+                });
+                video.addEventListener('error', mostrarSinSenal);
+            }
+        }
+
+        function mostrarSinSenal() { sinSenal.classList.remove('oculto'); }
+        function ocultarSinSenal() { sinSenal.classList.add('oculto'); }
+        function limpiarReproductor() {
+            if (shakaPlayer) { shakaPlayer.unload(); shakaPlayer.destroy(); shakaPlayer = null; }
+            video.pause(); video.removeAttribute('src'); video.load(); video.style.display = 'none'; canalActual = null;
+        }
+        function actualizarHora() {
+            const h = new Date();
+            document.querySelector('.hora').textContent = `${h.getHours().toString().padStart(2,'0')}:${h.getMinutes().toString().padStart(2,'0')}`;
+        }
+        actualizarHora(); setInterval(actualizarHora, 60000);
+
+        function generarTarjetas() {
+            listaScrollEl.innerHTML = '';
+            CHANNELS.forEach((ch, idx) => {
+                const esDASH = ch.tipo === 'dash';
+                const div = document.createElement('div');
+                div.className = 'tarjeta-canal';
+                div.tabIndex = 0;
+                div.dataset.index = idx;
+
+                const numero = document.createElement('span');
+                numero.className = 'numero-canal';
+                numero.textContent = ch.num;
+
+                const logo = document.createElement('div');
+                logo.className = 'logo-canal';
+                if (ch.logo) {
+                    const img = document.createElement('img');
+                    img.src = ch.logo;
+                    img.alt = '';
+                    img.loading = 'lazy';
+                    img.onerror = () => { logo.innerHTML = ''; logo.textContent = ch.name.slice(0,2); };
+                    logo.appendChild(img);
+                } else { logo.textContent = ch.name.slice(0,2); }
+
+                const info = document.createElement('div');
+                info.className = 'info-canal';
+                const nombre = document.createElement('span');
+                nombre.className = 'nombre-canal';
+                nombre.textContent = ch.name;
+                const subtitulo = document.createElement('span');
+                subtitulo.className = 'subtitulo-canal';
+                subtitulo.textContent = esDASH ? 'DASH + DRM' : 'En vivo';
+                info.appendChild(nombre);
+                info.appendChild(subtitulo);
+
+                const chevron = document.createElement('span');
+                chevron.className = 'chevron-canal';
+                chevron.textContent = '›';
+
+                div.appendChild(numero);
+                div.appendChild(logo);
+                div.appendChild(info);
+                div.appendChild(chevron);
+
+                div.onclick = () => {
+                    document.querySelectorAll('.tarjeta-canal').forEach(t => t.classList.remove('seleccionado'));
+                    div.classList.add('seleccionado');
+                    if (esDASH && ch.ruta) reproducirCanalDASH(ch);
+                    else if (ch.url) reproducirCanalHLS(ch);
+                    if (document.body.classList.contains('fullscreen-activo')) listaCanalesEl.classList.remove('visible');
+                };
+                listaScrollEl.appendChild(div);
+            });
+        }
+
+        function solicitarPantallaCompleta() {
+            if (!document.fullscreenElement) {
+                const el = document.documentElement;
+                const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+                if (req) req.call(el).catch(() => {});
+            }
+        }
+        document.getElementById('btn-full').onclick = () => {
+            if (!document.fullscreenElement) solicitarPantallaCompleta();
+            else document.exitFullscreen();
+        };
+        document.addEventListener('fullscreenchange', () => {
+            document.body.classList.toggle('fullscreen-activo', !!document.fullscreenElement);
+        });
+        let clickTimer = null;
+        areaCentral.addEventListener('click', () => {
+            if (!document.body.classList.contains('fullscreen-activo')) return;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => listaCanalesEl.classList.toggle('visible'), 300);
+        });
+        areaCentral.addEventListener('dblclick', () => {
+            clearTimeout(clickTimer);
+            if (!document.fullscreenElement) solicitarPantallaCompleta();
+            else document.exitFullscreen();
+        });
+        document.getElementById('btn-salir-panel').onclick = () => {
+            listaCanalesEl.classList.remove('visible');
+            if (document.fullscreenElement) document.exitFullscreen();
+        };
+        if (inputBusqueda) {
+            inputBusqueda.addEventListener('input', () => {
+                const t = inputBusqueda.value.trim().toLowerCase();
+                document.querySelectorAll('.tarjeta-canal').forEach((c, i) => {
+                    const n = c.querySelector('.nombre-canal')?.textContent.toLowerCase() || '';
+                    c.style.display = (!t || n.includes(t) || String(i+1) === t) ? 'flex' : 'none';
+                });
+            });
+        }
+        document.querySelectorAll('.opcion-menu').forEach(m => {
+            m.onclick = () => {
+                const d = m.dataset.href;
+                if (d) window.location.href = d + '.html';
+                document.querySelectorAll('.opcion-menu').forEach(i => i.classList.remove('activo'));
+                m.classList.add('activo');
+            };
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[LUMIX TV] ✅ Configuración cargada —', CHANNELS.length, 'canales');
+            generarTarjetas();
+            
+            const params = new URLSearchParams(window.location.search);
+            const canalUrl = (params.get('canal') || 'TELEFUTURO').toUpperCase();
+            
+            setTimeout(() => {
+                const canal = CHANNELS.find(c => c.name.toUpperCase() === canalUrl) || CHANNELS.find(c => c.id?.toUpperCase() === canalUrl) || CHANNELS[0];
+                if (canal) {
+                    const idx = CHANNELS.indexOf(canal);
+                    const tarjetas = document.querySelectorAll('.tarjeta-canal');
+                    if (tarjetas[idx]) tarjetas[idx].classList.add('seleccionado');
+                    if (canal.tipo === 'dash' && canal.ruta) reproducirCanalDASH(canal);
+                    else if (canal.url) reproducirCanalHLS(canal);
+                }
+            }, 300);
+        });
+    </script>
+</body>
+</html>
